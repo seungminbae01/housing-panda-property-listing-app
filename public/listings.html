@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listings</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 15px; }
+    .listing { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+    .title { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <a href="index.html">Add New Listing</a>
+  <h1>Property Listings</h1>
+  
+  <div id="listingsContainer">Loading...</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('/api/listings');
+        const listings = await response.json();
+        
+        const container = document.getElementById('listingsContainer');
+        
+        if (listings.length === 0) {
+          container.innerHTML = '<p>No listings available.</p>';
+          return;
+        }
+        
+        container.innerHTML = '';
+        
+        listings.forEach(listing => {
+          const listingEl = document.createElement('div');
+          listingEl.className = 'listing';
+          
+          listingEl.innerHTML = `
+            <div class="title">${listing.title}</div>
+            <div class="rent">$${listing.rent}/month</div>
+            <div>Address: ${listing.address}</div>
+            <div>Rooms: ${listing.rooms}</div>
+            ${listing.description ? `<p>${listing.description}</p>` : ''}
+            <div>Contact: ${listing.contact_info}</div>
+          `;
+          
+          container.appendChild(listingEl);
+        });
+        
+      } catch (err) {
+        document.getElementById('listingsContainer').innerHTML = 
+          '<p>Error loading listings.</p>';
+      }
+    });
+  </script>
+</body>
+</html>
